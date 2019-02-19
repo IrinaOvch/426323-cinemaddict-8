@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ирина Овчинникова](https://up.htmlacademy.ru/ecmascript/8/user/426323).
-* Наставник: `Неизвестно`.
+* Наставник: [Владимир Якушкин](https://up.htmlacademy.ru/ecmascript/8/user/126208).
 
 ---
 
