@@ -1,5 +1,6 @@
 import {generateFilter} from './generateFilter';
 import {generateCard} from './generateCard';
+import {films} from './data';
 
 const filterSection = document.querySelector(`.main-navigation`);
 const mainCardContainer = document.querySelector(`.films-list .films-list__container`);
@@ -54,24 +55,23 @@ const renderFilter = (filter) => {
 
 filters.forEach(renderFilter);
 
-
-const renderCards = (place, amount) => {
-  place.insertAdjacentHTML(`beforeend`, new Array(amount)
-    .fill(generateCard())
-    .join(``));
+const renderCards = (place, amount, cardArr) => {
+  cardArr.slice(0, amount).forEach((card) => {
+    const cardTemplateText = generateCard(card);
+    place.insertAdjacentHTML(`beforeend`, cardTemplateText);
+  });
 };
-
-renderCards(mainCardContainer, 7);
-
-cardContainers.forEach((place) => {
-  renderCards(place, 2);
-});
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
 };
+
+renderCards(mainCardContainer, 4, films);
+cardContainers.forEach((place) => {
+  renderCards(place, 2, films);
+});
 
 const filterInputs = filterSection.querySelectorAll(`.main-navigation__item`);
 
@@ -82,9 +82,9 @@ filterInputs.forEach((input) => {
     cardContainers.forEach((place) => {
       place.innerHTML = ``;
     });
-    renderCards(mainCardContainer, getRandomInt(1, 10));
+    renderCards(mainCardContainer, getRandomInt(1, 10), films);
     cardContainers.forEach((place) => {
-      renderCards(place, getRandomInt(1, 10));
+      renderCards(place, getRandomInt(1, 10), films);
     });
   });
 });
