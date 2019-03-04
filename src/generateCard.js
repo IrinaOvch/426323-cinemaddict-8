@@ -1,5 +1,4 @@
 import {getRandomElements} from './getRandomElements';
-import {getRandomTitle} from './getRandomTitle';
 
 export const generateCard = (film) => {
   return `<article class="film-card">
@@ -11,7 +10,7 @@ export const generateCard = (film) => {
       <span class="film-card__genre">${getRandomElements(film.genre, 1)}</span>
     </p>
     <img src="./images/posters/${film.poster}.jpg" alt="" class="film-card__poster">
-    <p class="film-card__description">${getRandomTitle(film.description, 3)}</p>
+    <p class="film-card__description">${getRandomElements(film.description, 3).join(` `)}</p>
     <button class="film-card__comments">${film.comments} comments</button>
 
     <form class="film-card__controls">
