@@ -1,8 +1,9 @@
-import {createElement} from './create-element';
 import {getRandomElements} from './getRandomElements';
+import {Component} from './component';
 
-export class Film {
+export class Film extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._poster = data.poster;
     this._description = data.description;
@@ -20,10 +21,6 @@ export class Film {
     if (typeof this._onComments === `function`) {
       this._onComments();
     }
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onComments(fn) {
@@ -56,20 +53,8 @@ export class Film {
         .addEventListener(`click`, this._onCommentsLinkClick.bind(this));
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {
     this._element.querySelector(`.film-card__comments`)
         .removeEventListener(`click`, this._onCommentsLinkClick);
   }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
 }
