@@ -1,8 +1,9 @@
-import {createElement} from './create-element';
 import {getRandomElements} from './getRandomElements';
+import {Component} from './component';
 
-export class FilmComments {
+export class FilmComments extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._poster = data.poster;
     this._description = data.description;
@@ -25,10 +26,6 @@ export class FilmComments {
 
   set onClose(fn) {
     this._onClose = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -196,17 +193,6 @@ export class FilmComments {
         </section>
       </form>
     </section>`;
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   bind() {
