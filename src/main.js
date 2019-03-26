@@ -109,3 +109,19 @@ commentsFilmComponents.forEach((component) => {
     component.unrender();
   };
 });
+
+commentsFilmComponents.forEach((component) => {
+  component.onAddComment = (comment) => {
+    component.comments = [...component._comments, comment];
+    component.update(component);
+    component.refreshComments();
+  };
+});
+
+commentsFilmComponents.forEach((component) => {
+  component.onRate = (rate) => {
+    component.userRating = rate;
+    component.update(component);
+  };
+});
+
