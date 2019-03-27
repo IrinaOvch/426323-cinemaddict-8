@@ -1,5 +1,10 @@
-import {getRandomElements} from './getRandomElements';
+import {getRandomElements} from './utils';
 import {Component} from './component';
+import {RATES, EMOJIS} from './data';
+import moment from 'moment';
+
+const ENTER_KEY = 13;
+
 
 export class FilmComments extends Component {
   constructor(data) {
@@ -8,13 +13,36 @@ export class FilmComments extends Component {
     this._poster = data.poster;
     this._description = data.description;
     this._rating = data.rating;
-    this._year = data.year;
-    this._genre = data.genre;
+    this._genres = data.genres;
     this._comments = data.comments;
     this._duration = data.duration;
+    this._director = data.director;
+    this._writers = data.writers;
+    this._actors = data.actors;
+    this._releaseDate = data.releaseDate;
+    this._country = data.country;
+    this._ageLimit = data.ageLimit;
+
+    this._state.chosenCommentEmoji = `sleeping`;
+    this._userRating = data.userRating ? data.userRating : ``;
 
     this._element = null;
     this._onComments = null;
+
+    this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
+    this._onAddCommentMessage = this._onAddCommentMessage.bind(this);
+    this._onChooseEmoji = this._onChooseEmoji.bind(this);
+    this._onChooseRating = this._onChooseRating.bind(this);
+  }
+
+  refresh() {
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
   }
 
   _onCloseButtonClick(evt) {
@@ -24,8 +52,93 @@ export class FilmComments extends Component {
     }
   }
 
-  set onClose(fn) {
-    this._onClose = fn;
+  set onClose(eventHandler) {
+    this._onClose = eventHandler;
+  }
+
+
+  _onChooseEmoji(evt) {
+    this._state.chosenCommentEmoji = evt.target.value;
+    this._element.querySelector(`.film-details__add-emoji-label`).innerText = EMOJIS[this._state.chosenCommentEmoji];
+  }
+
+  _onAddCommentMessage(evt) {
+    if (evt.keyCode === ENTER_KEY) {
+      evt.preventDefault();
+      const newComment = {
+        text: evt.target.value,
+        author: `Tim Macoveev`,
+        date: Date.now(),
+        emoji: this._state.chosenCommentEmoji,
+      };
+      this._comments = [...this._comments, newComment];
+      this.refreshComments();
+      if (typeof this._onAddComment === `function`) {
+        this._onAddComment(newComment);
+      }
+    }
+  }
+
+  set onAddComment(eventHandler) {
+    this._onAddComment = eventHandler;
+  }
+
+  set onRate(eventHandler) {
+    this._onRate = eventHandler;
+  }
+
+  _onChooseRating(evt) {
+    const newRate = evt.target.value;
+    this._element.querySelector(`.film-details__user-rating`).innerText = `Your rate ${newRate}`;
+    if (typeof this._onRate === `function`) {
+      this._onRate(newRate);
+    }
+    this._userRating = newRate;
+  }
+
+  refreshComments() {
+    this.unbind();
+    this._element.querySelector(`.film-details__comments-wrap`).innerHTML = this.commentsTemplate;
+    this.bind();
+  }
+
+  get commentsTemplate() {
+    return `
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">1</span></h3>
+
+          <ul class="film-details__comments-list">
+            ${this._comments.map((comment) => {
+    return `
+              <li class="film-details__comment">
+              <span class="film-details__comment-emoji">${EMOJIS[comment.emoji]}</span>
+              <div>
+                <p class="film-details__comment-text">${comment.text}</p>
+                <p class="film-details__comment-info">
+                  <span class="film-details__comment-author">${comment.author}</span>
+                  <span class="film-details__comment-day">${moment(comment.date).fromNow()}</span>
+                </p>
+              </div>
+            </li>`;
+  }).join(``)}
+          </ul>
+
+          <div class="film-details__new-comment">
+            <div>
+              <label for="add-emoji" class="film-details__add-emoji-label">${EMOJIS[this._state.chosenCommentEmoji]}</label>
+              <input type="checkbox" class="film-details__add-emoji visually-hidden" id="add-emoji">
+
+              <div class="film-details__emoji-list">
+              ${Object.entries(EMOJIS).map((emoji) => {
+    return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji[0]}" value="${emoji[0]}" ${this._state.chosenCommentEmoji === emoji[0] ? `checked` : ``}>
+                         <label class="film-details__emoji-label" for="emoji-${emoji[0]}">${emoji[1]}</label>`;
+  }).join(``)}
+              </div>
+            </div>
+            <label class="film-details__comment-label">
+              <textarea class="film-details__comment-input" placeholder="← Select reaction, add comment here" name="comment"></textarea>
+            </label>
+          </div>
+    `;
   }
 
   get template() {
@@ -38,7 +151,7 @@ export class FilmComments extends Component {
           <div class="film-details__poster">
             <img class="film-details__poster-img" src="./images/posters/${this._poster}.jpg" alt="incredables-2">
 
-            <p class="film-details__age">18+</p>
+            <p class="film-details__age">${this._ageLimit}+</p>
           </div>
 
           <div class="film-details__info">
@@ -50,41 +163,41 @@ export class FilmComments extends Component {
 
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${this._rating}</p>
-                <p class="film-details__user-rating">Your rate 8</p>
+                <p class="film-details__user-rating">Your rate ${this._userRating}</p>
               </div>
             </div>
 
             <table class="film-details__table">
               <tr class="film-details__row">
                 <td class="film-details__term">Director</td>
-                <td class="film-details__cell">Brad Bird</td>
+                <td class="film-details__cell">${this._director}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Writers</td>
-                <td class="film-details__cell">Brad Bird</td>
+                <td class="film-details__cell">${this._writers}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Actors</td>
-                <td class="film-details__cell">Samuel L. Jackson, Catherine Keener, Sophia Bush</td>
+                <td class="film-details__cell">${this._actors.join(`, `)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">15 June 2018 (USA)</td>
+                <td class="film-details__cell">${moment(this._releaseDate).format(`D MMMM YYYY`)} (${this._country})</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">118 min</td>
+                <td class="film-details__cell">${moment.duration(this._duration).asMinutes()} min</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
-                <td class="film-details__cell">USA</td>
+                <td class="film-details__cell">${this._country}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Genres</td>
                 <td class="film-details__cell">
-                  <span class="film-details__genre">Animation</span>
-                  <span class="film-details__genre">Action</span>
-                  <span class="film-details__genre">Adventure</span></td>
+                  ${getRandomElements(this._genres, 3).map((genre) => (
+    `<span class="film-details__genre">${genre}</span>`
+  )).join(``)}
               </tr>
             </table>
 
@@ -106,41 +219,7 @@ export class FilmComments extends Component {
         </section>
 
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">1</span></h3>
-
-          <ul class="film-details__comments-list">
-            <li class="film-details__comment">
-              <span class="film-details__comment-emoji">😴</span>
-              <div>
-                <p class="film-details__comment-text">So long-long story, boring!</p>
-                <p class="film-details__comment-info">
-                  <span class="film-details__comment-author">Tim Macoveev</span>
-                  <span class="film-details__comment-day">3 days ago</span>
-                </p>
-              </div>
-            </li>
-          </ul>
-
-          <div class="film-details__new-comment">
-            <div>
-              <label for="add-emoji" class="film-details__add-emoji-label">😐</label>
-              <input type="checkbox" class="film-details__add-emoji visually-hidden" id="add-emoji">
-
-              <div class="film-details__emoji-list">
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-                <label class="film-details__emoji-label" for="emoji-sleeping">😴</label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-neutral-face" value="neutral-face" checked>
-                <label class="film-details__emoji-label" for="emoji-neutral-face">😐</label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-grinning" value="grinning">
-                <label class="film-details__emoji-label" for="emoji-grinning">😀</label>
-              </div>
-            </div>
-            <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="← Select reaction, add comment here" name="comment"></textarea>
-            </label>
-          </div>
+          ${this.commentsTemplate}
         </section>
 
         <section class="film-details__user-rating-wrap">
@@ -160,33 +239,10 @@ export class FilmComments extends Component {
               <p class="film-details__user-rating-feelings">How you feel it?</p>
 
               <div class="film-details__user-rating-score">
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="1" id="rating-1">
-                <label class="film-details__user-rating-label" for="rating-1">1</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="2" id="rating-2">
-                <label class="film-details__user-rating-label" for="rating-2">2</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="3" id="rating-3">
-                <label class="film-details__user-rating-label" for="rating-3">3</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="4" id="rating-4">
-                <label class="film-details__user-rating-label" for="rating-4">4</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="5" id="rating-5" checked>
-                <label class="film-details__user-rating-label" for="rating-5">5</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="6" id="rating-6">
-                <label class="film-details__user-rating-label" for="rating-6">6</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="7" id="rating-7">
-                <label class="film-details__user-rating-label" for="rating-7">7</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="8" id="rating-8">
-                <label class="film-details__user-rating-label" for="rating-8">8</label>
-
-                <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="9" id="rating-9">
-                <label class="film-details__user-rating-label" for="rating-9">9</label>
-
+                ${RATES.map((rate) => {
+    return `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${rate}" id="rating-${rate}" ${rate === this._userRating ? `checked` : ``}>
+                          <label class="film-details__user-rating-label" for="rating-${rate}">${rate}</label>`;
+  }).join(``)}
               </div>
             </section>
           </div>
@@ -197,11 +253,27 @@ export class FilmComments extends Component {
 
   bind() {
     this._element.querySelector(`.film-details__close-btn`)
-        .addEventListener(`click`, this._onCloseButtonClick.bind(this));
+        .addEventListener(`click`, this._onCloseButtonClick);
+    this._element.querySelector(`.film-details__comment-input`)
+        .addEventListener(`keydown`, this._onAddCommentMessage);
+    this._element.querySelectorAll(`.film-details__emoji-item`).forEach((element) => {
+      element.addEventListener(`click`, this._onChooseEmoji);
+    });
+    this._element.querySelectorAll(`.film-details__user-rating-input`).forEach((element) => {
+      element.addEventListener(`click`, this._onChooseRating);
+    });
   }
 
   unbind() {
     this._element.querySelector(`.film-details__close-btn`)
         .removeEventListener(`click`, this._onCloseButtonClick);
+    this._element.querySelector(`.film-details__comment-input`)
+        .removeEventListener(`keydown`, this._onAddCommentMessage);
+    this._element.querySelectorAll(`.film-details__emoji-item`).forEach((element) => {
+      element.removeEventListener(`click`, this._onChooseEmoji);
+    });
+    this._element.querySelectorAll(`.film-details__user-rating-input`).forEach((element) => {
+      element.removeEventListener(`click`, this._onChooseRating);
+    });
   }
 }

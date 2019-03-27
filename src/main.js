@@ -109,3 +109,4 @@ commentsFilmComponents.forEach((component) => {
     component.unrender();
   };
 });
+

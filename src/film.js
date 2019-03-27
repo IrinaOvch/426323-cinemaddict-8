@@ -1,5 +1,6 @@
-import {getRandomElements} from './getRandomElements';
+import {getRandomElements} from './utils';
 import {Component} from './component';
+import moment from 'moment';
 
 export class Film extends Component {
   constructor(data) {
@@ -8,10 +9,10 @@ export class Film extends Component {
     this._poster = data.poster;
     this._description = data.description;
     this._rating = data.rating;
-    this._year = data.year;
-    this._genre = data.genre;
-    this._comments = data.comments;
+    this._genres = data.genres;
+    this._commentsAmount = data.commentsAmount;
     this._duration = data.duration;
+    this._releaseDate = data.releaseDate;
 
     this._element = null;
     this._onComments = null;
@@ -32,13 +33,14 @@ export class Film extends Component {
       <h3 class="film-card__title">${this._title}</h3>
       <p class="film-card__rating">${this._rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${this._year}</span>
-        <span class="film-card__duration">${this._duration}</span>
-        <span class="film-card__genre">${getRandomElements(this._genre, 1)}</span>
+        <span class="film-card__year">${moment(this._releaseDate).format(`YYYY`)}</span>
+        <span class="film-card__duration">${moment.utc(moment.duration(this._duration).asMilliseconds()).format(`H[h] mm[m]`)}
+        </span>
+        <span class="film-card__genre">${getRandomElements(this._genres, 1)}</span>
       </p>
       <img src="./images/posters/${this._poster}.jpg" alt="" class="film-card__poster">
       <p class="film-card__description">${getRandomElements(this._description, 3).join(` `)}</p>
-      <button class="film-card__comments">${this._comments} comments</button>
+      <button class="film-card__comments">${this._commentsAmount} comments</button>
 
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist"><!--Add to watchlist--> WL</button>
