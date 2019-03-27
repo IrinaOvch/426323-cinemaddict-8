@@ -3,6 +3,8 @@ import {Component} from './component';
 import {RATES, EMOJIS} from './data';
 import moment from 'moment';
 
+const ENTER_KEY = 13;
+
 
 export class FilmComments extends Component {
   constructor(data) {
@@ -50,8 +52,8 @@ export class FilmComments extends Component {
     }
   }
 
-  set onClose(fn) {
-    this._onClose = fn;
+  set onClose(eventHandler) {
+    this._onClose = eventHandler;
   }
 
 
@@ -61,7 +63,7 @@ export class FilmComments extends Component {
   }
 
   _onAddCommentMessage(evt) {
-    if (evt.key === `Enter`) {
+    if (evt.keyCode === ENTER_KEY) {
       evt.preventDefault();
       const newComment = {
         text: evt.target.value,
@@ -69,18 +71,20 @@ export class FilmComments extends Component {
         date: Date.now(),
         emoji: this._state.chosenCommentEmoji,
       };
+      this._comments = [...this._comments, newComment];
+      this.refreshComments();
       if (typeof this._onAddComment === `function`) {
         this._onAddComment(newComment);
       }
     }
   }
 
-  set onAddComment(fn) {
-    this._onAddComment = fn;
+  set onAddComment(eventHandler) {
+    this._onAddComment = eventHandler;
   }
 
-  set onRate(fn) {
-    this._onRate = fn;
+  set onRate(eventHandler) {
+    this._onRate = eventHandler;
   }
 
   _onChooseRating(evt) {
@@ -89,11 +93,7 @@ export class FilmComments extends Component {
     if (typeof this._onRate === `function`) {
       this._onRate(newRate);
     }
-  }
-
-  update(data) {
-    this._comments = data.comments;
-    this._userRating = data.userRating;
+    this._userRating = newRate;
   }
 
   refreshComments() {
