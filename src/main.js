@@ -1,68 +1,22 @@
-import {generateFilter} from './generateFilter';
-import {films} from './data';
+import {films, filters} from './data';
 import {Film} from './film';
 import {FilmComments} from './film-comments';
+import {Filter} from './filter';
+import {drawStat, getRankLabel, watchedFilmsStat} from './stats';
+import moment from 'moment';
 
-const filterSection = document.querySelector(`.main-navigation`);
+const filterContainer = document.querySelector(`.main-navigation`);
 const filmsMainContainer = document.querySelector(`.films-list .films-list__container`);
-const filmsContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
+const commentsContainer = document.querySelector(`body`);
 
-const filters = [
-  {
-    id: `all`,
-    active: true,
-    additional: false,
-    name: `All movies`,
-    withAmount: false,
-    amount: ``
-  },
-  {
-    id: `watchlist`,
-    active: false,
-    additional: false,
-    name: `Watchlist `,
-    withAmount: true,
-    amount: `13`
-  },
-  {
-    id: `history`,
-    active: false,
-    additional: false,
-    name: `History `,
-    withAmount: true,
-    amount: `4`
-  },
-  {
-    id: `favorites`,
-    active: false,
-    additional: false,
-    name: `Favorites `,
-    withAmount: true,
-    amount: `8`
-  },
-  {
-    id: `stats`,
-    active: false,
-    additional: true,
-    name: `Stats`,
-    withAmount: false,
-    amount: ``
-  }
-];
-const renderFilter = (filter) => {
-  const filterTemplateText = generateFilter(filter);
-  filterSection.insertAdjacentHTML(`beforeend`, filterTemplateText);
-};
+const filmSection = document.querySelector(`.films`);
+const statSection = document.querySelector(`.statistic`);
+const textStat = document.querySelectorAll(`p.statistic__item-text`);
+const statRankLabel = document.querySelector(`.statistic__rank-label`);
 
-filters.forEach(renderFilter);
-
-const getRandomInt = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-};
-
-const filterInputs = filterSection.querySelectorAll(`.main-navigation__item`);
+const filterComponents = filters.map((filter) => {
+  return new Filter(filter);
+});
 const filmComponents = films.map((film) => {
   return new Film(film);
 });
@@ -70,31 +24,21 @@ const commentsFilmComponents = films.map((film) => {
   return new FilmComments(film);
 });
 
-
-filmComponents.forEach((filmComponent) => {
-  filmsMainContainer.appendChild(filmComponent.render());
-});
-const commentsContainer = document.querySelector(`body`);
-
-const renderCards = (place, amount, cardArr) => {
-  cardArr.slice(0, amount).forEach((film) => {
-    place.appendChild(film.render());
+const renderCards = (cardsArr, container) => {
+  container.innerHTML = ``;
+  cardsArr.forEach((filmComponent) => {
+    container.appendChild(filmComponent.render());
   });
 };
 
-filterInputs.forEach((input) => {
-  input.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-    filmsMainContainer.innerHTML = ``;
-    filmsContainers.forEach((place) => {
-      place.innerHTML = ``;
-    });
-    renderCards(filmsMainContainer, getRandomInt(1, 10), filmComponents);
-    filmsContainers.forEach((place) => {
-      renderCards(place, getRandomInt(1, 10), filmComponents);
-    });
+const renderFilters = (filtersArr) => {
+  filtersArr.forEach((filterComponent) => {
+    filterContainer.appendChild(filterComponent.render());
   });
-});
+};
+
+renderFilters(filterComponents);
+renderCards(filmComponents, filmsMainContainer);
 
 filmComponents.forEach((component, index) => {
   component.onComments = () => {
@@ -110,3 +54,49 @@ commentsFilmComponents.forEach((component) => {
   };
 });
 
+filmComponents.forEach((component) => {
+  component.onMarkAsWatched = () => {
+
+  };
+});
+
+const filterFilms = (initialFilms, filterName) => {
+  switch (filterName) {
+    case `all`:
+      return initialFilms;
+
+    case `watchlist`:
+      return initialFilms.filter((it) => it._isInWatchlist === true);
+
+    case `history`:
+      return initialFilms.filter((it) => it._isWatched === true);
+    default:
+      return [];
+  }
+};
+
+filterComponents.forEach((component) => {
+  if (component._id === `stats`) {
+    return;
+  }
+  component.onFilter = (id) => {
+    filmSection.classList.remove(`visually-hidden`);
+    statSection.classList.add(`visually-hidden`);
+    const filterName = id;
+    const filteredFilms = filterFilms(filmComponents, filterName);
+    renderCards(filteredFilms, filmsMainContainer);
+  };
+});
+const statsButton = document.querySelector(`.main-navigation__item--additional`);
+
+const onStatsClick = (evt) => {
+  drawStat(filmComponents);
+  evt.preventDefault();
+  statSection.classList.remove(`visually-hidden`);
+  filmSection.classList.add(`visually-hidden`);
+  statRankLabel.innerHTML = getRankLabel(watchedFilmsStat.mostWatchedGenre);
+  textStat[0].innerHTML = `${watchedFilmsStat.amount} <span class="statistic__item-description">movies</span>`;
+  textStat[1].innerHTML = `${moment.utc(moment.duration(watchedFilmsStat.duration).asMilliseconds()).format(`H[<span class="statistic__item-description">h</span>] mm[<span class="statistic__item-description">m</span>]`)}`;
+  textStat[2].innerHTML = `${watchedFilmsStat.mostWatchedGenre || `—`}`;
+};
+statsButton.addEventListener(`click`, onStatsClick);
