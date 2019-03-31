@@ -14,9 +14,9 @@ export class Film extends Component {
     this._duration = data.duration;
     this._releaseDate = data.releaseDate;
 
-    this._isWatched = data.isWatched;
-    this._isInWatchlist = data.isInWatchlist;
-    this._isFavourite = data.isFavourite;
+    this.isWatched = data.isWatched;
+    this.isInWatchlist = data.isInWatchlist;
+    this.isFavourite = data.isFavourite;
 
     this._element = null;
     this._onComments = null;
@@ -45,7 +45,7 @@ export class Film extends Component {
     if (typeof this._onAddToWatchList === `function`) {
       this._onAddToWatchList();
     }
-    this._isInWatchlist = !this._isInWatchlist;
+    this.isInWatchlist = !this.isInWatchlist;
   }
 
   set onMarkAsWatched(eventHandler) {
@@ -57,7 +57,7 @@ export class Film extends Component {
     if (typeof this._onMarkAsWatched === `function`) {
       this._onMarkAsWatched();
     }
-    this._isWatched = !this._isWatched;
+    this.isWatched = !this.isWatched;
   }
 
   get template() {

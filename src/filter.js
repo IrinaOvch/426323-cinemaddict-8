@@ -4,7 +4,7 @@ export class Filter extends Component {
 
   constructor(data) {
     super();
-    this._id = data.id;
+    this.id = data.id;
     this._active = data.active;
     this._additional = data.additional;
     this._name = data.name;
@@ -28,7 +28,7 @@ export class Filter extends Component {
   }
 
   get template() {
-    return `<a href="#${this._id}" id="${this._id}" class="main-navigation__item ${this._active ? `main-navigation__item--active` : ``} ${this._additional ? `main-navigation__item--additional` : ``}">${this._name}${this._withAmount ? `<span class="main-navigation__item-count">${this._amount}</span>` : ``}</a>`.trim();
+    return `<a href="#${this.id}" id="${this.id}" class="main-navigation__item ${this._active ? `main-navigation__item--active` : ``} ${this._additional ? `main-navigation__item--additional` : ``}">${this._name}${this._withAmount ? `<span class="main-navigation__item-count">${this._amount}</span>` : ``}</a>`.trim();
   }
 
   bind() {

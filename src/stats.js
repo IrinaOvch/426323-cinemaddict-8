@@ -1,19 +1,21 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-
-const statCtx = document.querySelector(`.statistic__chart`);
-export const watchedFilmsStat = {};
+import {statOptions} from './stat-options';
+import moment from 'moment';
 
 const BAR_HEIGHT = 50;
+
+const statCtx = document.querySelector(`.statistic__chart`);
+const textStat = document.querySelectorAll(`p.statistic__item-text`);
+const statRankLabel = document.querySelector(`.statistic__rank-label`);
+const watchedFilmsStat = {};
+
 statCtx.height = BAR_HEIGHT * 5;
 
 const getGenreStats = (films) => {
   return films.reduce((acc, film) => {
     film._genres.forEach((genre) => {
-      if (!acc[genre]) {
-        acc[genre] = 0;
-      }
-      acc[genre]++;
+      acc[genre] = (acc[genre] || 0) + 1;
     });
     return acc;
   }, {});
@@ -26,43 +28,41 @@ const getTotalDuration = (films) => {
 };
 
 const sortStats = (stats) => {
-  return Object.entries(stats).sort((a, b) => b[1] - a[1]);
+  return Object.entries(stats).sort((left, right) => right[1] - left[1]);
 };
 
-const getStat = (cardsArr) => {
-  const filteredCards = cardsArr.filter((card) => card._isWatched);
+const getStat = (cards) => {
+  const filteredCards = cards.filter((card) => card.isWatched);
   watchedFilmsStat.amount = filteredCards.length;
   watchedFilmsStat.duration = getTotalDuration(filteredCards);
   const genreStats = getGenreStats(filteredCards);
-  const labels = sortStats(genreStats).map((item) => item[0]);
-  const values = sortStats(genreStats).map((item) => item[1]);
+  const sortedGenreStats = sortStats(genreStats);
+  const labels = sortedGenreStats.map(([label]) => label);
+  // eslint-disable-next-line no-unused-vars
+  const values = sortedGenreStats.map(([label, value]) => value);
   watchedFilmsStat.mostWatchedGenre = labels[0];
   return {labels, values};
 };
 
-export const getRankLabel = (genre) => {
-  switch (genre) {
-    case `Comedy`:
-      return `ComedyLover`;
-    case `Horror`:
-      return `Horror-Fan`;
-    case `Drama`:
-      return `DramaTic`;
-    case `Fantasy`:
-      return `Fantastic`;
-    case `Thriller`:
-      return `ThrillerLover`;
-    case `Animation`:
-      return `AnimationLover`;
-    case `Sci-Fi`:
-      return `Sci-Fighter`;
-    default:
-      return `Beginner`;
-  }
+const fillStatsWithData = (stat) => {
+  statRankLabel.innerHTML = rankLabels[stat.mostWatchedGenre] || `Beginner`;
+  textStat[0].innerHTML = `${stat.amount} <span class="statistic__item-description">movies</span>`;
+  textStat[1].innerHTML = `${moment.utc(moment.duration(stat.duration).asMilliseconds()).format(`H[<span class="statistic__item-description">h</span>] mm[<span class="statistic__item-description">m</span>]`)}`;
+  textStat[2].innerHTML = `${stat.mostWatchedGenre || `—`}`;
 };
 
-export const drawStat = (cardsArr) => {
-  const genresStat = getStat(cardsArr);
+export const rankLabels = {
+  "Comedy": `ComedyLover`,
+  "Horror": `Horror-Fan`,
+  "Drama": `DramaTic`,
+  "Fantasy": `Fantastic`,
+  "Thriller": `ThrillerLover`,
+  "Animation": `AnimationLover`,
+  "Sci-Fi": `Sci-Fighter`
+};
+
+const drawStat = (cards) => {
+  const genresStat = getStat(cards);
   const myChart = new Chart(statCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
@@ -75,49 +75,9 @@ export const drawStat = (cardsArr) => {
         anchor: `start`
       }]
     },
-    options: {
-      plugins: {
-        datalabels: {
-          font: {
-            size: 20
-          },
-          color: `#ffffff`,
-          anchor: `start`,
-          align: `start`,
-          offset: 40,
-        }
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            fontColor: `#ffffff`,
-            padding: 100,
-            fontSize: 20
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          barThickness: 24
-        }],
-        xAxes: [{
-          ticks: {
-            display: false,
-            beginAtZero: true
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-        }],
-      },
-      legend: {
-        display: false
-      },
-      tooltips: {
-        enabled: false
-      }
-    }
+    options: statOptions,
   });
   return myChart;
 };
+
+export {drawStat, watchedFilmsStat, fillStatsWithData};
