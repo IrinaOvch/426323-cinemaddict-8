@@ -102,6 +102,7 @@ export class FilmComments extends Component {
     this.bind();
   }
 
+
   get commentsTemplate() {
     return `
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">1</span></h3>

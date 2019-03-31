@@ -7,6 +7,7 @@
     "start": "webpack-dev-server --open",
     "build": "webpack",
     "eslint": "eslint src/**/*.js",
+    "eslint:fix": "eslint src/**/*.js --fix",
     "test": "npm run eslint"
   },
   "devDependencies": {
@@ -20,6 +21,8 @@
     "node": "10"
   },
   "dependencies": {
+    "chart.js": "2.8.0",
+    "chartjs-plugin-datalabels": "0.6.0",
     "moment": "^2.24.0"
   }
 }

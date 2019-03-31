@@ -1,6 +1,18 @@
+import {getRandElements, getRandomInt} from './utils';
 export const RATES = [...new Array(9)].map((element, i) => i + 1);
 const MS_IN_DAY = 24 * 60 * 60 * 1000;
 const MS_IN_HOUR = 60000;
+
+const defaultGenres = new Set([
+  `Comedy`,
+  `Horror`,
+  `Drama`,
+  `Fantasy`,
+  `Thriller`,
+  `Animation`,
+  `Sci-Fi`
+]);
+
 export const films = [...new Array(10)].map(() => {
   return {
     title: [
@@ -61,18 +73,11 @@ export const films = [...new Array(10)].map(() => {
         emoji: `sleeping`,
       }
     ],
-    genres: new Set([
-      `Comedy`,
-      `Horror`,
-      `Drama`,
-      `Fantasy`,
-      `Thriller`,
-      `Animation`,
-    ]),
+    genres: getRandElements(defaultGenres, 3),
     commentsAmount: Math.round(Math.random() * 100),
-    duration: Math.floor(Math.random() * (180 - 15) + 15) * MS_IN_HOUR,
-    ageLimit: Math.floor(Math.random() * (18 - 6) + 6),
-    userRating: Math.floor(Math.random() * (10 - 1) + 1),
+    duration: Math.floor(getRandomInt(15, 180)) * MS_IN_HOUR,
+    ageLimit: Math.floor(getRandomInt(6, 18)),
+    userRating: Math.floor(getRandomInt(1, 10)),
     director: `Brad Bird`,
     writers: `Brad Bird`,
     actors: [
@@ -80,8 +85,54 @@ export const films = [...new Array(10)].map(() => {
       `Catherine Keener`,
       `Sophia Bush`
     ],
+    isWatched: false,
+    isInWatchlist: false,
+    isFavourite: false,
   };
 });
+
+export const initianFilters = [
+  {
+    id: `all`,
+    active: false,
+    additional: false,
+    name: `All movies`,
+    withAmount: false,
+    amount: ``
+  },
+  {
+    id: `watchlist`,
+    active: false,
+    additional: false,
+    name: `Watchlist `,
+    withAmount: true,
+    amount: `13`
+  },
+  {
+    id: `history`,
+    active: false,
+    additional: false,
+    name: `History `,
+    withAmount: true,
+    amount: `4`
+  },
+  {
+    id: `favorites`,
+    active: false,
+    additional: false,
+    name: `Favorites `,
+    withAmount: true,
+    amount: `8`
+  },
+  {
+    id: `stats`,
+    active: false,
+    additional: true,
+    name: `Stats`,
+    withAmount: false,
+    amount: ``
+  }
+];
 
 export const EMOJIS = {
   "sleeping": `😴`,
