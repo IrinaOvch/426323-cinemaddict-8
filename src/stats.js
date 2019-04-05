@@ -38,8 +38,7 @@ const getStat = (cards) => {
   const genreStats = getGenreStats(filteredCards);
   const sortedGenreStats = sortStats(genreStats);
   const labels = sortedGenreStats.map(([label]) => label);
-  // eslint-disable-next-line no-unused-vars
-  const values = sortedGenreStats.map(([label, value]) => value);
+  const values = sortedGenreStats.map((item) => item[1]);
   watchedFilmsStat.mostWatchedGenre = labels[0];
   return {labels, values};
 };
