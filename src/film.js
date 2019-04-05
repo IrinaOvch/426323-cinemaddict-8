@@ -1,4 +1,3 @@
-import {getRandomElements} from './utils';
 import {Component} from './component';
 import moment from 'moment';
 
@@ -10,7 +9,7 @@ export class Film extends Component {
     this._description = data.description;
     this._rating = data.rating;
     this._genres = data.genres;
-    this._commentsAmount = data.commentsAmount;
+    this._comments = data.comments;
     this._duration = data.duration;
     this._releaseDate = data.releaseDate;
 
@@ -60,19 +59,23 @@ export class Film extends Component {
     this.isWatched = !this.isWatched;
   }
 
+  update(data) {
+    this._comments = data.comments;
+  }
+
   get template() {
     return `<article class="film-card">
       <h3 class="film-card__title">${this._title}</h3>
       <p class="film-card__rating">${this._rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${moment(this._releaseDate).format(`YYYY`)}</span>
-        <span class="film-card__duration">${moment.utc(moment.duration(this._duration).asMilliseconds()).format(`H[h] mm[m]`)}
+        <span class="film-card__duration">${moment.utc(moment.duration(this._duration, `minutes`).asMilliseconds()).format(`H[h] mm[m]`)}
         </span>
         <span class="film-card__genre">${this._genres[0]}</span>
       </p>
-      <img src="./images/posters/${this._poster}.jpg" alt="" class="film-card__poster">
-      <p class="film-card__description">${getRandomElements(this._description, 3).join(` `)}</p>
-      <button class="film-card__comments">${this._commentsAmount} comments</button>
+      <img src="./${this._poster}" alt="" class="film-card__poster">
+      <p class="film-card__description">${this._description}</p>
+      <button class="film-card__comments">${this._comments.length} comments</button>
 
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist"><!--Add to watchlist--> WL</button>
@@ -93,7 +96,7 @@ export class Film extends Component {
 
   unbind() {
     this._element.querySelector(`.film-card__comments`)
-        .moveEventListener(`click`, this._onCommentsLinkClick);
+        .removeEventListener(`click`, this._onCommentsLinkClick);
     this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
             .removeEventListener(`click`, this._onAddToWatchListClick);
     this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
