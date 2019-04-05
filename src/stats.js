@@ -6,8 +6,8 @@ import moment from 'moment';
 const BAR_HEIGHT = 50;
 
 const statCtx = document.querySelector(`.statistic__chart`);
-const textStat = document.querySelectorAll(`p.statistic__item-text`);
 const statRankLabel = document.querySelector(`.statistic__rank-label`);
+const statisticTextList = document.querySelector(`.statistic__text-list`);
 const watchedFilmsStat = {};
 
 statCtx.height = BAR_HEIGHT * 5;
@@ -46,9 +46,27 @@ const getStat = (cards) => {
 
 const fillStatsWithData = (stat) => {
   statRankLabel.innerHTML = rankLabels[stat.mostWatchedGenre] || `Beginner`;
-  textStat[0].innerHTML = `${stat.amount} <span class="statistic__item-description">movies</span>`;
-  textStat[1].innerHTML = `${moment.utc(moment.duration(stat.duration).asMilliseconds()).format(`H[<span class="statistic__item-description">h</span>] mm[<span class="statistic__item-description">m</span>]`)}`;
-  textStat[2].innerHTML = `${stat.mostWatchedGenre || `—`}`;
+  const statisticList = [
+    {
+      title: `You watched`,
+      text: `${stat.amount} <span class="statistic__item-description">movies</span>`
+    },
+    {
+      title: `Total duration`,
+      text: `${moment.utc(moment.duration(stat.duration, `minutes`).asMilliseconds()).format(`H[<span class="statistic__item-description">h</span>] mm[<span class="statistic__item-description">m</span>]`)}`,
+    },
+    {
+      title: `Top genre`,
+      text: `${stat.mostWatchedGenre || `—`}`,
+    }
+  ];
+  statisticTextList.innerHTML = statisticList.map((statItem) => {
+    return `
+    <li class="statistic__text-item">
+      <h4 class="statistic__item-title">${statItem.title}</h4>
+      <p class="statistic__item-text">${statItem.text}</p>
+    </li>`;
+  }).join(``);
 };
 
 export const rankLabels = {

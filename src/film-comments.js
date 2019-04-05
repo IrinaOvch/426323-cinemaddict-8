@@ -10,11 +10,12 @@ export class FilmComments extends Component {
   constructor(data) {
     super();
     this._title = data.title;
+    this._alternativeTitle = data.alternativeTitle;
     this._poster = data.poster;
     this._description = data.description;
     this._rating = data.rating;
     this._genres = data.genres;
-    this._comments = data.comments;
+    this.comments = data.comments;
     this._duration = data.duration;
     this._director = data.director;
     this._writers = data.writers;
@@ -71,8 +72,6 @@ export class FilmComments extends Component {
         date: Date.now(),
         emoji: this._state.chosenCommentEmoji,
       };
-      this._comments = [...this._comments, newComment];
-      this.refreshComments();
       if (typeof this._onAddComment === `function`) {
         this._onAddComment(newComment);
       }
@@ -87,13 +86,15 @@ export class FilmComments extends Component {
     this._onRate = eventHandler;
   }
 
+  update(data) {
+    this._userRating = data.userRating;
+  }
+
   _onChooseRating(evt) {
     const newRate = evt.target.value;
-    this._element.querySelector(`.film-details__user-rating`).innerText = `Your rate ${newRate}`;
     if (typeof this._onRate === `function`) {
       this._onRate(newRate);
     }
-    this._userRating = newRate;
   }
 
   refreshComments() {
@@ -105,10 +106,10 @@ export class FilmComments extends Component {
 
   get commentsTemplate() {
     return `
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">1</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this.comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${this._comments.map((comment) => {
+            ${this.comments.map((comment) => {
     return `
               <li class="film-details__comment">
               <span class="film-details__comment-emoji">${EMOJIS[comment.emoji]}</span>
@@ -150,7 +151,7 @@ export class FilmComments extends Component {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${this._poster}.jpg" alt="incredables-2">
+            <img class="film-details__poster-img" src="./${this._poster}" alt="incredables-2">
 
             <p class="film-details__age">${this._ageLimit}+</p>
           </div>
@@ -159,7 +160,7 @@ export class FilmComments extends Component {
             <div class="film-details__info-head">
               <div class="film-details__title-wrap">
                 <h3 class="film-details__title">${this._title}</h3>
-                <p class="film-details__title-original">Original: Невероятная семейка</p>
+                <p class="film-details__title-original">Original: ${this._alternativeTitle}</p>
               </div>
 
               <div class="film-details__rating">
@@ -175,7 +176,7 @@ export class FilmComments extends Component {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Writers</td>
-                <td class="film-details__cell">${this._writers}</td>
+                <td class="film-details__cell">${this._writers.join(`, `)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Actors</td>
@@ -187,7 +188,7 @@ export class FilmComments extends Component {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${moment.duration(this._duration).asMinutes()} min</td>
+                <td class="film-details__cell">${this._duration} min</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
@@ -203,7 +204,7 @@ export class FilmComments extends Component {
             </table>
 
             <p class="film-details__film-description">
-               ${getRandomElements(this._description, 3).join(` `)}
+               ${this._description}
             </p>
           </div>
         </div>

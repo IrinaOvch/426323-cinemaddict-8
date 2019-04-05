@@ -8,6 +8,32 @@
   <link rel="stylesheet" type="text/css" media="screen" href="./css/normalize.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="./css/main.css" />
   <title>Moowle</title>
+  <style>
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+    
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+    
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+      .shake {
+        animation: shake 0.6s;
+      }
+    </style>
 </head>
 <body>
 
@@ -101,7 +127,7 @@
       </div>
     </section>
   </section>
-  <section class="statistic">
+  <section class="statistic visually-hidden">
     <p class="statistic__rank">Your rank <span class="statistic__rank-label">Sci-Fighter</span></p>
   
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters visually-hidden">
@@ -124,18 +150,6 @@
     </form>
   
     <ul class="statistic__text-list">
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
-      </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
-      </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Sci-Fi</p>
-      </li>
     </ul>
   
     <div class="statistic__chart-wrap">
@@ -154,6 +168,7 @@
 </footer>
 
 <script src="./bundle.js"></script>
+
 
 </body>
 </html>
