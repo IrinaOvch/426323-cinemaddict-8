@@ -3,9 +3,6 @@ import {Component} from './component';
 import {RATES, EMOJIS} from './data';
 import moment from 'moment';
 
-const ENTER_KEY = 13;
-
-
 export class FilmComments extends Component {
   constructor(data) {
     super();
@@ -23,6 +20,7 @@ export class FilmComments extends Component {
     this._releaseDate = data.releaseDate;
     this._country = data.country;
     this._ageLimit = data.ageLimit;
+    this.watchingDate = data.watchingDate;
 
     this._state.chosenCommentEmoji = `sleeping`;
     this._userRating = data.userRating ? data.userRating : ``;
@@ -34,6 +32,10 @@ export class FilmComments extends Component {
     this._onAddCommentMessage = this._onAddCommentMessage.bind(this);
     this._onChooseEmoji = this._onChooseEmoji.bind(this);
     this._onChooseRating = this._onChooseRating.bind(this);
+    this._onDeleteCommentClick = this._onDeleteCommentClick.bind(this);
+    this._onAddToWatchListClick = this._onAddToWatchListClick.bind(this);
+    this._onMarkAsWatchedClick = this._onMarkAsWatchedClick.bind(this);
+    this._onAddToFavoutitesClick = this._onAddToFavoutitesClick.bind(this);
   }
 
   refresh() {
@@ -47,10 +49,13 @@ export class FilmComments extends Component {
   }
 
   _onCloseButtonClick(evt) {
-    evt.preventDefault();
-    if (typeof this._onClose === `function`) {
-      this._onClose();
+    if (evt.key === `Escape` || evt.type === `click`) {
+      evt.preventDefault();
+      if (typeof this._onClose === `function`) {
+        this._onClose();
+      }
     }
+
   }
 
   set onClose(eventHandler) {
@@ -64,7 +69,7 @@ export class FilmComments extends Component {
   }
 
   _onAddCommentMessage(evt) {
-    if (evt.keyCode === ENTER_KEY) {
+    if ((evt.key === `Enter` && evt.ctrlKey === true) || (evt.key === `Enter` && evt.metaKey === true)) {
       evt.preventDefault();
       const newComment = {
         text: evt.target.value,
@@ -72,6 +77,7 @@ export class FilmComments extends Component {
         date: Date.now(),
         emoji: this._state.chosenCommentEmoji,
       };
+      this._element.querySelector(`.film-details__user-rating-controls`).classList.remove(`visually-hidden`);
       if (typeof this._onAddComment === `function`) {
         this._onAddComment(newComment);
       }
@@ -90,11 +96,56 @@ export class FilmComments extends Component {
     this._userRating = data.userRating;
   }
 
+  _onDeleteCommentClick() {
+    if (typeof this._onDeleteComment === `function`) {
+      this._onDeleteComment();
+    }
+
+  }
+
+  set onDeleteComment(eventHandler) {
+    this._onDeleteComment = eventHandler;
+  }
+
   _onChooseRating(evt) {
     const newRate = evt.target.value;
     if (typeof this._onRate === `function`) {
       this._onRate(newRate);
     }
+  }
+
+  set onAddToWatchList(eventHandler) {
+    this._onAddToWatchList = eventHandler;
+  }
+
+  _onAddToWatchListClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onAddToWatchList === `function`) {
+      this._onAddToWatchList();
+    }
+  }
+
+  set onMarkAsWatched(eventHandler) {
+    this._onMarkAsWatched = eventHandler;
+  }
+
+  _onMarkAsWatchedClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onMarkAsWatched === `function`) {
+      this._onMarkAsWatched();
+    }
+  }
+
+  _onAddToFavoutitesClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onAddToFavoutites === `function`) {
+      this._onAddToFavoutites();
+    }
+
+  }
+
+  set onAddToFavoutites(eventHandler) {
+    this._onAddToFavoutites = eventHandler;
   }
 
   refreshComments() {
@@ -225,9 +276,9 @@ export class FilmComments extends Component {
         </section>
 
         <section class="film-details__user-rating-wrap">
-          <div class="film-details__user-rating-controls">
-            <span class="film-details__watched-status film-details__watched-status--active">Already watched</span>
-            <button class="film-details__watched-reset" type="button">undo</button>
+          <div class="film-details__user-rating-controls visually-hidden">
+            <span class="film-details__watched-status film-details__watched-status--active"></span>
+            <button class="film-details__watched-reset visually-hidden" type="button" >undo</button>
           </div>
 
           <div class="film-details__user-score">
@@ -256,6 +307,7 @@ export class FilmComments extends Component {
   bind() {
     this._element.querySelector(`.film-details__close-btn`)
         .addEventListener(`click`, this._onCloseButtonClick);
+    document.addEventListener(`keydown`, this._onCloseButtonClick);
     this._element.querySelector(`.film-details__comment-input`)
         .addEventListener(`keydown`, this._onAddCommentMessage);
     this._element.querySelectorAll(`.film-details__emoji-item`).forEach((element) => {
@@ -264,11 +316,20 @@ export class FilmComments extends Component {
     this._element.querySelectorAll(`.film-details__user-rating-input`).forEach((element) => {
       element.addEventListener(`click`, this._onChooseRating);
     });
+    this._element.querySelector(`.film-details__watched-reset`)
+        .addEventListener(`click`, this._onDeleteCommentClick);
+    this._element.querySelector(`.film-details__control-label--watchlist`)
+        .addEventListener(`click`, this._onAddToWatchListClick);
+    this._element.querySelector(`.film-details__control-label--watched`)
+        .addEventListener(`click`, this._onMarkAsWatchedClick);
+    this._element.querySelector(`.film-details__control-label--favorite`)
+        .addEventListener(`click`, this._onAddToFavoutitesClick);
   }
 
   unbind() {
     this._element.querySelector(`.film-details__close-btn`)
         .removeEventListener(`click`, this._onCloseButtonClick);
+    document.removeEventListener(`keydown`, this._onCloseButtonClick);
     this._element.querySelector(`.film-details__comment-input`)
         .removeEventListener(`keydown`, this._onAddCommentMessage);
     this._element.querySelectorAll(`.film-details__emoji-item`).forEach((element) => {
@@ -277,5 +338,14 @@ export class FilmComments extends Component {
     this._element.querySelectorAll(`.film-details__user-rating-input`).forEach((element) => {
       element.removeEventListener(`click`, this._onChooseRating);
     });
+    this._element.querySelector(`.film-details__watched-reset`)
+        .removeEventListener(`click`, this._onDeleteCommentClick);
+    this._element.querySelector(`.film-details__control-label--watchlist`)
+        .removeEventListener(`click`, this._onAddToWatchListClick);
+    this._element.querySelector(`.film-details__control-label--watched`)
+        .removeEventListener(`click`, this._onMarkAsWatchedClick);
+    this._element.querySelector(`.film-details__control-label--favorite`)
+        .removeEventListener(`click`, this._onAddToFavoutitesClick);
   }
+
 }
