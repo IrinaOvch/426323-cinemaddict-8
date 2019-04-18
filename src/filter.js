@@ -8,12 +8,13 @@ export class Filter extends Component {
     this._active = data.active;
     this._additional = data.additional;
     this._name = data.name;
-    this._amount = data.amount;
+    this.amount = data.amount;
     this._withAmount = data.withAmount;
 
     this._element = null;
 
     this._onFilterClick = this._onFilterClick.bind(this);
+    this._onStatsClick = this._onStatsClick.bind(this);
   }
 
   _onFilterClick(evt) {
@@ -27,15 +28,35 @@ export class Filter extends Component {
     this._onFilter = eventHandler;
   }
 
+  set onStats(eventHandler) {
+    this._onStats = eventHandler;
+  }
+
+  _onStatsClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onStats === `function`) {
+      this._onStats(evt);
+    }
+  }
+
   get template() {
-    return `<a href="#${this.id}" id="${this.id}" class="main-navigation__item ${this._active ? `main-navigation__item--active` : ``} ${this._additional ? `main-navigation__item--additional` : ``}">${this._name}${this._withAmount ? `<span class="main-navigation__item-count">${this._amount}</span>` : ``}</a>`.trim();
+    return `<a href="#${this.id}" id="${this.id}" class="main-navigation__item ${this._active ? `main-navigation__item--active` : ``} ${this._additional ? `main-navigation__item--additional` : ``}">${this._name}${this._withAmount ? `<span class="main-navigation__item-count">${this.amount}</span>` : ``}</a>`.trim();
   }
 
   bind() {
-    this._element.addEventListener(`click`, this._onFilterClick);
+    if (this._element.id !== `stats`) {
+      this._element.addEventListener(`click`, this._onFilterClick);
+    } else {
+      this._element.addEventListener(`click`, this._onStatsClick);
+    }
+
   }
 
   unbind() {
-    this._element.removeEventListener(`click`, this._onFilterClick);
+    if (this._element.id === `stats`) {
+      this._element.removeEventListener(`click`, this._onFilterClick);
+    } else {
+      this._element.removeEventListener(`click`, this._onStatsClick);
+    }
   }
 }

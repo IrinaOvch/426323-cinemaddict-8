@@ -41,3 +41,19 @@ export const block = (element) => {
 export const unblock = (element) => {
   element.disabled = false;
 };
+
+export const generateRank = (rank) => {
+  if (rank < 1) {
+    return ``;
+  }
+  if (rank <= 10) {
+    return `Novice`;
+  }
+  if (rank <= 20) {
+    return `Fan`;
+  }
+  
+  return `Movie buff`;
+};
+
+

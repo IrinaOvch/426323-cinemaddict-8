@@ -2,6 +2,11 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {statOptions} from './stat-options';
 import moment from 'moment';
+import 'moment-duration-format';
+
+moment.updateLocale(`en`, {
+  durationLabelTypes: [{type: `standard`, string: `___`}]
+});
 
 const BAR_HEIGHT = 50;
 
@@ -31,11 +36,20 @@ const sortStats = (stats) => {
   return Object.entries(stats).sort((left, right) => right[1] - left[1]);
 };
 
-const getStat = (cards) => {
+const periods = {
+  'statistic-all-time': () => true,
+  'statistic-today': (it) => moment(it.watchingDate).format(`D`) === moment(Date.now()).format(`D`),
+  'statistic-week': (it) => moment(it.watchingDate).format(`W`) === moment(Date.now()).format(`W`),
+  'statistic-month': (it) => moment(it.watchingDate).format(`M`) === moment(Date.now()).format(`M`),
+  'statistic-year': (it) => moment(it.watchingDate).format(`Y`) === moment(Date.now()).format(`Y`),
+};
+
+const getStat = (cards, period) => {
   const filteredCards = cards.filter((card) => card.isWatched);
-  watchedFilmsStat.amount = filteredCards.length;
-  watchedFilmsStat.duration = getTotalDuration(filteredCards);
-  const genreStats = getGenreStats(filteredCards);
+  const periodCards = filteredCards.filter(periods[period]);
+  watchedFilmsStat.amount = periodCards.length;
+  watchedFilmsStat.duration = getTotalDuration(periodCards);
+  const genreStats = getGenreStats(periodCards);
   const sortedGenreStats = sortStats(genreStats);
   const labels = sortedGenreStats.map(([label]) => label);
   const values = sortedGenreStats.map((item) => item[1]);
@@ -52,7 +66,7 @@ const fillStatsWithData = (stat) => {
     },
     {
       title: `Total duration`,
-      text: `${moment.utc(moment.duration(stat.duration, `minutes`).asMilliseconds()).format(`H[<span class="statistic__item-description">h</span>] mm[<span class="statistic__item-description">m</span>]`)}`,
+      text: `${moment.duration(stat.duration, `minutes`).format(`H [<span class="statistic__item-description">h</span>] mm[<span class="statistic__item-description">m</span>]`)}`,
     },
     {
       title: `Top genre`,
@@ -75,11 +89,15 @@ export const rankLabels = {
   "Fantasy": `Fantastic`,
   "Thriller": `ThrillerLover`,
   "Animation": `AnimationLover`,
+  "Adventure": `Globetrotter`,
+  "Action": `Actioner`,
+  "Family": `Family-guy`,
   "Sci-Fi": `Sci-Fighter`
 };
 
-const drawStat = (cards) => {
-  const genresStat = getStat(cards);
+const drawStat = (cards, period) => {
+  statCtx.innerHTML = ``;
+  const genresStat = getStat(cards, period);
   const myChart = new Chart(statCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
