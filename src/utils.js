@@ -52,8 +52,6 @@ export const generateRank = (rank) => {
   if (rank <= 20) {
     return `Fan`;
   }
-  
+
   return `Movie buff`;
 };
-
-
