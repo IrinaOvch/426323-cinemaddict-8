@@ -221,8 +221,8 @@ const processFilm = (film) => {
     });
   };
 
-  return filmComponent
-}
+  return filmComponent;
+};
 
 const renderCards = (films, container) => {
   renderedFilms = 0;
@@ -320,8 +320,7 @@ api.getFilms().then((films) => {
     render(filteredFilms, filmsMainContainer);
     showMoreButton.classList.add(`visually-hidden`);
   };
-}).catch((e) => {
-  console.log(`Error: ${e}`)
+}).catch(() => {
   filmsMainContainer.innerHTML = `<p>Something went wrong while loading movies. Check your connection or try again later</p>`;
 });
 

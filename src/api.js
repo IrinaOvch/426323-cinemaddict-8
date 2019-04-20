@@ -48,4 +48,4 @@ const API = class {
   }
 };
 
-export default API
+export default API;

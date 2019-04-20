@@ -64,7 +64,7 @@ export class FilmComments extends Component {
     this._onMarkAsWatched = eventHandler;
   }
 
-  set onAddToFavoutites(eventHandler) {
+  set onAddToFavourites(eventHandler) {
     this._onAddToFavourites = eventHandler;
   }
 
@@ -269,7 +269,7 @@ export class FilmComments extends Component {
   }
 
   _hotkeyOccured(evt) {
-    return (evt.key === `Enter` && evt.ctrlKey === true) || (evt.key === `Enter` && evt.metaKey === true)
+    return (evt.key === `Enter` && evt.ctrlKey === true) || (evt.key === `Enter` && evt.metaKey === true);
   }
 
   _onCloseButtonClick(evt) {
@@ -288,10 +288,10 @@ export class FilmComments extends Component {
   }
 
   _onAddCommentMessage(evt) {
-    if (!hotkeyOccured(evt)) {
+    if (!this._hotkeyOccured(evt)) {
       return;
     }
-    
+
     evt.preventDefault();
     const ratingControls = this._element.querySelector(`.film-details__user-rating-controls`);
     ratingControls.classList.remove(`visually-hidden`);
@@ -314,7 +314,7 @@ export class FilmComments extends Component {
   }
 
   _onChooseRating(evt) {
-    evt.preventDefault()
+    evt.preventDefault();
     const inputElement = document.getElementById(evt.target.htmlFor);
     inputElement.checked = true;
     const newRate = Number(inputElement.value);
@@ -337,7 +337,7 @@ export class FilmComments extends Component {
     evt.preventDefault();
     const inputElement = this._element.querySelector(`#${evt.target.htmlFor}`);
     inputElement.checked = !inputElement.checked;
-    
+
     if (typeof this._onMarkAsWatched === `function`) {
       this._onMarkAsWatched();
     }
@@ -347,7 +347,7 @@ export class FilmComments extends Component {
     evt.preventDefault();
     const inputElement = this._element.querySelector(`#${evt.target.htmlFor}`);
     inputElement.checked = !inputElement.checked;
-    
+
     if (typeof this._onAddToFavourites === `function`) {
       this._onAddToFavourites();
     }

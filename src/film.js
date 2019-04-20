@@ -39,10 +39,10 @@ export class Film extends Component {
     this._onMarkAsWatched = eventHandler;
   }
 
-  set onAddToFavoutites(eventHandler) {
+  set onAddToFavourites(eventHandler) {
     this._onAddToFavourites = eventHandler;
   }
-  
+
   get template() {
     return `<article class="film-card">
       <h3 class="film-card__title">${this._title}</h3>

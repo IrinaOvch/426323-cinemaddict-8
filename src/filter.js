@@ -31,16 +31,16 @@ export class Filter extends Component {
 
   bind() {
     this._element.addEventListener(
-      `click`,
-      this._element.id === `stats` ? this._onStatsClick : this._onFilterClick
-      );
+        `click`,
+        this._element.id === `stats` ? this._onStatsClick : this._onFilterClick
+    );
   }
 
   unbind() {
     this._element.removeEventListener(
-      `click`,
-      this._element.id === `stats` ? this._onStatsClick : this._onFilterClick
-      );
+        `click`,
+        this._element.id === `stats` ? this._onStatsClick : this._onFilterClick
+    );
   }
 
   _onFilterClick(evt) {
