@@ -15,7 +15,7 @@ const statRankLabel = document.querySelector(`.statistic__rank-label`);
 const statisticTextList = document.querySelector(`.statistic__text-list`);
 const watchedFilmsStat = {};
 
-statCtx.height = BAR_HEIGHT * 5;
+statCtx.height = BAR_HEIGHT * 6;
 
 const getGenreStats = (films) => {
   return films.reduce((acc, film) => {
@@ -38,10 +38,10 @@ const sortStats = (stats) => {
 
 const periods = {
   'statistic-all-time': () => true,
-  'statistic-today': (it) => moment(it.watchingDate).format(`D`) === moment(Date.now()).format(`D`),
-  'statistic-week': (it) => moment(it.watchingDate).format(`W`) === moment(Date.now()).format(`W`),
-  'statistic-month': (it) => moment(it.watchingDate).format(`M`) === moment(Date.now()).format(`M`),
-  'statistic-year': (it) => moment(it.watchingDate).format(`Y`) === moment(Date.now()).format(`Y`),
+  'statistic-today': (it) => moment(it.watchingDate).isSame(Date.now(), `day`),
+  'statistic-week': (it) => moment(it.watchingDate).isSame(Date.now(), `week`),
+  'statistic-month': (it) => moment(it.watchingDate).isSame(Date.now(), `month`),
+  'statistic-year': (it) => moment(it.watchingDate).isSame(Date.now(), `year`),
 };
 
 const getStat = (cards, period) => {
@@ -95,23 +95,30 @@ export const rankLabels = {
   "Sci-Fi": `Sci-Fighter`
 };
 
+const myChart = new Chart(statCtx, {
+  plugins: [ChartDataLabels],
+  type: `horizontalBar`,
+  data: {
+    labels: [],
+    datasets: [{
+      data: [],
+      backgroundColor: `#ffe800`,
+      hoverBackgroundColor: `#ffe800`,
+      anchor: `start`
+    }]
+  },
+  options: statOptions,
+});
+
 const drawStat = (cards, period) => {
   statCtx.innerHTML = ``;
   const genresStat = getStat(cards, period);
-  const myChart = new Chart(statCtx, {
-    plugins: [ChartDataLabels],
-    type: `horizontalBar`,
-    data: {
-      labels: genresStat.labels,
-      datasets: [{
-        data: genresStat.values,
-        backgroundColor: `#ffe800`,
-        hoverBackgroundColor: `#ffe800`,
-        anchor: `start`
-      }]
-    },
-    options: statOptions,
+
+  myChart.data.labels = genresStat.labels;
+  myChart.data.datasets.forEach((dataset) => {
+    dataset.data = genresStat.values;
   });
+  myChart.update();
   return myChart;
 };
 
