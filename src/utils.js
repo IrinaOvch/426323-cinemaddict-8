@@ -32,7 +32,7 @@ export const generateRank = (rank) => {
     return `Novice`;
   }
   if (rank <= 20) {
-    return `Fan`;
+    return `Fann`;
   }
   return `Movie buff`;
 };
